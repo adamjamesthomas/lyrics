@@ -10,8 +10,8 @@ const headers = {
   'Authorization': token
 }
 //Categories
-export const getCategories = (artist, title) =>
-  fetch(`${api}/api/find/${artist}/${title}`, { headers })
+export const getLyrics = (artist, title) =>
+  fetch(`${api}/api/find/${artist}/${title}`, {  })
     .then(res => res.json())
     //.then(data => data.categories)
 
