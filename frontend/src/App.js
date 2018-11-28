@@ -3,7 +3,7 @@ import film_reel from './icons/film_reel.svg';
 import { Route, Link, withRouter } from 'react-router-dom'
 import CreatePost from './CreatePost';
 import './App.css';
-import {getLyrics, setSong} from './actions/index.js'
+import {getLyrics, setSong, guess} from './actions/index.js'
 import { connect } from 'react-redux'
 import serializeForm from 'form-serialize';
 
@@ -12,13 +12,15 @@ class App extends Component {
     hasSong : [],
     artist: [],
     song: [],
-    lyrics: []
+    lyrics: [],
+    guess: ""
   }
   componentDidMount() {
-      //this.props.dispatch(getLyrics("John Lennon", "Imagine"))
+      this.setState({guess: ""})
       
   }
   handleChange = (e) => {
+    e.preventDefault()
     switch(e.target.name){
       case "artist":
         this.setState({artist: e.target.value})
@@ -27,7 +29,8 @@ class App extends Component {
         this.setState({song: e.target.value})
         break;
       case "guess":
-        this.handleGuess(e.target.value)
+        //this.setState({guess: e.target.value})
+        this.props.dispatch(guess(e.target.value))
         break;
       default:
     }
@@ -57,7 +60,7 @@ class App extends Component {
    
 
   render() {
-    const {hasSong, lyrics, itle, artist} = this.props;
+    const {hasSong, lyrics, guess, title, artist} = this.props;
     //const lyrics = this.state.lyrics
     console.log(hasSong)
     return (
@@ -91,13 +94,12 @@ class App extends Component {
           <div>
             <form>
               Guess Lyric
-              <input type="text" name="guess" onChange={this.handleChange} />
+              <input type="text" name="guess" value={guess} onChange={this.handleChange} />
             </form>
           </div>
         <ol className='post-list'>
         {lyrics.map((word) => (
             <li key={word.id} className='post-list-item'>
-
             {word.display}
             </li>
         ))
@@ -117,7 +119,8 @@ function mapStateToProps (state) {
       hasSong: state.hasSong,
       lyrics: state.lyrics,
       title: state.title,
-      artist: state.artist
+      artist: state.artist,
+      guess: state.guess
   }
 }
 

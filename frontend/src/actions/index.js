@@ -2,7 +2,8 @@ import * as LyricsAPI from '../utils/LyricsAPI.js'
 import {
     RECEIVE_LYRICS,
     SET_SONG,
-    START_LOAD
+    START_LOAD,
+    GUESS
 } from './types.js'
 
 
@@ -27,7 +28,12 @@ export function setSong (hasSong, artist = "", song = "") {
         song
     }
 }
-
+export function guess (guess) {
+    return {
+        type: GUESS,
+        guess
+    }
+}
 export function receiveLyrics (lyrics) {
     return {
         type: RECEIVE_LYRICS,

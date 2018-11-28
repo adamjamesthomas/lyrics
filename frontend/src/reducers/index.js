@@ -1,6 +1,7 @@
 import {
     RECEIVE_LYRICS,
     SET_SONG,
+    GUESS,
     START_LOAD
 } from '../actions/types.js'
 
@@ -9,7 +10,8 @@ const initialLyricsState = {
     title: [],
     lyrics: [],
     hasSong: false,
-    loading: false
+    loading: false,
+    guess: ""
 }
 
 function posts (state = initialLyricsState, action) {
@@ -56,6 +58,27 @@ function posts (state = initialLyricsState, action) {
         return {
             ...state, 
             lyrics: words
+        }
+        case GUESS :
+
+            var newLyrics = state.lyrics.slice()
+            var isSuccess = false
+            var newGuess = action.guess
+            newLyrics.forEach(word => {
+                if (word.lyric == newGuess && word.guessed == false) {
+                  console.log("guess worked")
+                  word.guessed = true
+                  word.display = word.lyric
+                  isSuccess = true
+                }
+              })
+              if (isSuccess) {
+                  newGuess = ""
+              }
+        return {
+            ...state,
+            lyrics: newLyrics,
+            guess: newGuess
         }
         default :
         return state
