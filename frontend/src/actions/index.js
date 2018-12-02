@@ -3,7 +3,9 @@ import {
     RECEIVE_LYRICS,
     SET_SONG,
     START_LOAD,
-    GUESS
+    GUESS,
+    START_RUN,
+    TICK
 } from './types.js'
 
 
@@ -11,6 +13,11 @@ export function startLoad (loadType) {
     return {
         type: START_LOAD,
         loadType
+    }
+}
+export function tick () {
+    return {
+        type: TICK
     }
 }
 export const getLyrics  = (artist, title) => dispatch => {
@@ -26,6 +33,12 @@ export function setSong (hasSong, artist = "", song = "") {
         hasSong,
         artist,
         song
+    }
+}
+export function startRun (timer) {
+    return {
+        type: START_RUN,
+        timer
     }
 }
 export function guess (guess) {

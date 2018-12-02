@@ -2,7 +2,9 @@ import {
     RECEIVE_LYRICS,
     SET_SONG,
     GUESS,
-    START_LOAD
+    START_LOAD,
+    START_RUN,
+    TICK
 } from '../actions/types.js'
 
 const initialLyricsState = {
@@ -11,12 +13,23 @@ const initialLyricsState = {
     lyrics: [],
     hasSong: false,
     loading: false,
-    guess: ""
+    guess: "",
+    numGuessed: 0,
+    numTotal: 0,
+    isRunning: false,
+    isVictory: false,
+    finalMinutes: 0,
+    finalSeconds: 0,
+    elapsedTime: 0,
+    seconds: 0,
+    minutes: 0,
+    timer: null
 }
 
 function posts (state = initialLyricsState, action) {
     var updatedComments;
     var updatedPosts;
+    console.log(action.type)
     switch (action.type) {
         case START_LOAD :
         return {
@@ -26,47 +39,66 @@ function posts (state = initialLyricsState, action) {
         case SET_SONG :
         if (action.hasSong) {
             return {
-                ...state,
+                ...initialLyricsState,
                 hasSong: action.hasSong,
                 artist: action.artist,
-                song: action.song
+                title: action.song,
             }
         } else {
             return {
                 ...state,
                 hasSong: action.hasSong,
                 artist: "",
-                song: ""
+                title: ""
             }
         }
+        case START_RUN :
+            
+            return {
+                ...state,
+                isRunning: true,
+                timer: action.timer
+            }
         
         case RECEIVE_LYRICS :
         console.log(action)
         var lyrics = action.lyrics.lyric.replace(/\n/g, " ").split(" ")
         var words = []
         lyrics.forEach(function(word, i) {
+            var cleanWord = word.toLowerCase()
+            cleanWord = cleanWord.replace(/\W/g, '')
             var newWord = {
+                cleanWord: cleanWord,
                 lyric: word,
                 display: "",
                 guessed: false,
                 id: i
             }
-            words.push(newWord)
+            if (cleanWord.length > 0){
+                words.push(newWord)
+            }
         });
         console.log(lyrics)
         console.log(words)
         return {
             ...state, 
-            lyrics: words
+            lyrics: words,
+            numTotal: words.length,
+
         }
         case GUESS :
 
+
             var newLyrics = state.lyrics.slice()
-            var isSuccess = false
+            
+
+            
+            var isSuccess = false //for tracking whether guess was successful
             var newGuess = action.guess
+            var numGuessCounter = state.numGuessed //running total of lyrics guessed correctly
             newLyrics.forEach(word => {
-                if (word.lyric == newGuess && word.guessed == false) {
-                  console.log("guess worked")
+                if (word.cleanWord == newGuess && word.guessed == false) {
+                  numGuessCounter++
                   word.guessed = true
                   word.display = word.lyric
                   isSuccess = true
@@ -74,12 +106,37 @@ function posts (state = initialLyricsState, action) {
               })
               if (isSuccess) {
                   newGuess = ""
+                  if (numGuessCounter == state.numTotal) {
+                    return {
+                        ...state,
+                        lyrics: newLyrics,
+                        guess: newGuess,
+                        numGuessed: numGuessCounter,
+                        isVictory: true,
+                        isRunning: false,
+                        finalMinutes: state.minutes,
+                        finalSeconds: state.seconds
+                    }
+                  }
               }
         return {
             ...state,
             lyrics: newLyrics,
-            guess: newGuess
+            guess: newGuess,
+            numGuessed: numGuessCounter
         }
+        case TICK :
+            if(state.isRunning) {
+                var seconds = state.elapsedTime + 1
+                var minutes = Math.floor(seconds  / 60)
+                seconds = seconds - minutes * 60
+                return {
+                    ...state,
+                    elapsedTime: state.elapsedTime + 1,
+                    seconds: seconds,
+                    minutes: minutes
+                }
+            }
         default :
         return state
     }
